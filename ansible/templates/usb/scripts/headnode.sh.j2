@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #
-# Copyright (c) 2015-2018, Erigones, s. r. o.
+# Copyright (c) 2015-2019, Erigones, s. r. o.
 #
 
 unset LD_LIBRARY_PATH
@@ -522,9 +522,14 @@ function _zk() {
 }
 
 test_cfgdb_connect() {
-	if [[ -z "$("${QUERY_CFGDB}" get /esdc 2> /dev/null)" ]]; then
-		fatal "Unable to query cfgdb"
-	fi
+	local retries=5
+	while [[ "$(( retries-- ))" > 0 ]]; do
+		if [[ -n "$("${QUERY_CFGDB}" get /esdc 2> /dev/null)" ]]; then
+			return 0
+		fi
+		sleep 5
+	done
+	fatal "Unable to query cfgdb"
 }
 
 function configure_cfgdb() {

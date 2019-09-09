@@ -1,4 +1,9 @@
 ---
+- name: Enable fsync for the virtual machine disk
+  shell: zfs set sync=standard "$(vmadm get {{ zone_uuid }} | json {% if zone_brand == 'kvm' %}disks.0.{% endif %}zfs_filesystem)"
+  when: vm_fsync_off | default(true)
+  ignore_errors: True
+
 # sm-prepare-image -y shuts the machine down
 - name: Wait for a few seconds (SmartOS)
   pause: seconds=30
@@ -15,7 +20,7 @@
 - name: Create image from virtual machine
   command: chdir="/opt/{{ zone_uuid }}" imgadm create -c gzip "{{ zone_uuid }}"
            name='{{ image_name }}'
-           version='{{ image_version }}'
+           version='"{{ image_version }}"'
            tags='{{ image_tags | to_json }}'
            published_at="{{ lookup('pipe', 'date -u +\"%Y-%m-%dT%H:%M:%SZ\"') }}"
            state="active"

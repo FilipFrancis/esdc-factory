@@ -43,10 +43,15 @@ update_file() {
 # return 0 if cleared
 clear_maint() {
 	local svc="${1}"
+	local svc_state="$(/usr/bin/svcs -Ho state ${svc})"
 
 	# clear maintenance if necessary
-	if [[ "$(/usr/bin/svcs -Ho state ${svc})" == "maintenance" ]]; then
+	if [[ "${svc_state}" == "maintenance" ]]; then
 		/usr/sbin/svcadm clear "${svc}"
+		return 0
+	elif [[ "${svc_state}" == "disabled" ]]; then
+		# by default ike service is disabled at boot
+		/usr/sbin/svcadm enable "${svc}"
 		return 0
 	else
 		return 1
@@ -56,16 +61,16 @@ clear_maint() {
 
 reload_svc() {
 	local svc="${1}"
+	local svc_state="$(/usr/bin/svcs -Ho state ${svc})"
 
 	# refresh or enable service if applicable
-	if [[ "$(/usr/bin/svcs -Ho state ${svc})" == "disabled" ]]; then
+	if [[ "${svc_state}" == "disabled" ]]; then
 		/usr/sbin/svcadm enable "${svc}"
-	elif [[ "$(/usr/bin/svcs -Ho state ${svc})" == "online" ]]; then
+	elif [[ "${svc_state}" == "online" ]]; then
 		/usr/sbin/svcadm refresh "${svc}"
 	else
 		clear_maint "${svc}"
 	fi
-
 }
 
 update_ipsec_conf() {
@@ -81,7 +86,8 @@ update_ipsec_conf() {
 	if [[ "${rc1}" -eq 0 || "${rc2}" -eq 0 ]]; then
 		# at least one file has been updated
 		reload_svc "${IKE_SERVICE}"
-	else
+	elif [[ -f "${IKE_CONF_DST}" ]]; then
+		# config file exists, enable ike service
 		clear_maint "${IKE_SERVICE}"
 	fi
 

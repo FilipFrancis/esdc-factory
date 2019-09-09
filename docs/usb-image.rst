@@ -19,6 +19,20 @@ Both USB images are assembled together from these components:
 Changelog
 ~~~~~~~~~
 
+4.0
+=====
+Released on 2019-05-14
+
+- Updated to a new platform version - `<TBD>` from upstream/release-`<TBD>`
+- Updated pkgsrc version to 2018Q4 - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
+- Updated archives - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
+- Bumped default gcc version from 4.9 to 7 - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
+- Allow parralel builds of ``hn`` and ``cn`` usb images - `#126 <https://github.com/erigones/esdc-factory/pull/126>`
+- Fixed CPU monitoring script - `esdc-ce#375 <https://github.com/erigones/esdc-ce/issues/375>`__
+- Fixed ``ike`` service not enabled after reboot - `#124 <https://github.com/erigones/esdc-factory/pull/124>`__
+- Added 04-mtu-set.sh to override incorrectly set non-default MTU in KVM - `#430 <https://github.com/erigones/esdc-ce/issues/430>`__
+
+
 3.0.0
 =====
 Released on 2018-05-07
